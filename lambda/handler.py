@@ -1,8 +1,21 @@
 import json
 import uuid
 import time
+from decimal import Decimal
+
 from services.bedrock_service import BedrockService
 from services.dynamodb_service import DynamoDBService
+
+
+class DecimalEncoder(json.JSONEncoder):
+    """DynamoDBのDecimal型をJSONシリアライズ可能にする"""
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            if obj % 1 == 0:
+                return int(obj)
+            return float(obj)
+        return super().default(obj)
+
 
 bedrock_service = BedrockService()
 dynamodb_service = DynamoDBService()
@@ -179,5 +192,5 @@ def response(status_code, body):
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps(body)
+        'body': json.dumps(body, cls=DecimalEncoder)
     }
