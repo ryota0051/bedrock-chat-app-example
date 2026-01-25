@@ -40,6 +40,18 @@ class ApiStack(Stack):
                     'X-Amz-Security-Token'
                 ]
             ),
+            deploy_options=apigateway.StageOptions(
+                # API全体のスロットリング: 25 req/sec, burst 50
+                throttling_rate_limit=25,
+                throttling_burst_limit=50,
+                # POST /chat エンドポイント固有のスロットリング
+                method_options={
+                    "/chat/POST": apigateway.MethodDeploymentOptions(
+                        throttling_rate_limit=2,
+                        throttling_burst_limit=5,
+                    )
+                }
+            ),
         )
 
         # Lambda統合
