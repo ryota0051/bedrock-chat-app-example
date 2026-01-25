@@ -156,7 +156,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#212121] flex">
+    <div className="h-screen bg-[#212121] flex overflow-hidden">
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
