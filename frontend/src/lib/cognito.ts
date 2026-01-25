@@ -54,9 +54,20 @@ export async function login(username: string, password: string): Promise<LoginRe
           });
         },
         onFailure: (err) => {
+          // セキュリティのため、詳細なエラーメッセージを隠す
+          // ユーザー列挙攻撃を防ぐため、認証関連のエラーはすべて同じメッセージを返す
+          let errorMessage = 'ユーザー名またはパスワードが正しくありません';
+
+          // ユーザーの存在を示唆しないエラーのみ別メッセージ
+          if (err.code === 'TooManyRequestsException' || err.code === 'LimitExceededException') {
+            errorMessage = 'リクエストが多すぎます。しばらく待ってから再試行してください';
+          } else if (err.code === 'NetworkError') {
+            errorMessage = 'ネットワークエラーが発生しました。接続を確認してください';
+          }
+
           resolve({
             success: false,
-            error: err.message || 'ログインに失敗しました',
+            error: errorMessage,
           });
         },
       });
